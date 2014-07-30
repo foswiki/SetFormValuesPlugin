@@ -65,6 +65,6 @@ One line description, required for extensions repository catalog.
 |  Version: | %$VERSION% |
 |  Release: | %$RELEASE% |
 |  Change&nbsp;History: | <!-- versions below in reverse order -->&nbsp; |
-|  1.0.0 (%$CREATEDATE%): | Initial version |
+|  1.0 (30 Jul 2014): | Initial version |
 |  Home: | http://foswiki.org/Extensions/%TOPIC% |
 |  Support: | http://foswiki.org/Support/%TOPIC% | 
