@@ -1,0 +1,70 @@
+%META:TOPICPARENT{name="Plugins"}%
+---+ Set Form Values Plugin
+
+%SHORTDESCRIPTION%
+
+This plugin enables automatic setting of values in form fields when you save a topic - based on the the change of another form field.
+
+The typical application is to set the date of a field when another field changes to a specific value.
+
+For example - you may have an application with a form field "State" that can have the values "New", "Assigned", and "Completed". And you have 3 date fields "Date Created", "Date Assigned", and "Date Completed".
+
+You know your users will often forget set these dates manually.
+
+This plugin will set the dates for the 3 date fields when the State field *changes* from any other value, to the value specified by a rule. You can save the same topic multiple times, without changing the State field. The date field will only update when the State field changes to the rule value.
+
+Rules are defined in a rule topic by a simple table. The rules topic is defined by a preference setting SETFORMVALUESPLUGIN_RULES which can be set per site, web or topic.
+
+The format of the table can be seen in the example in the next section.
+
+Note that when working with field names, spaces must be removed (like you must also do with for example SEARCH)
+
+---++ Plugin Preferences
+
+The rules for setting fields are defined by a rules topic.
+
+To enable the rules define a preference setting SETFORMVALUESPLUGIN_RULES which point to the rules topic
+
+An example of a rules topic is 
+
+<verbatim>
+
+   * Set NOAUTOLINK = on
+
+| *Form* | *Match field* | *Match value* | *Target Field* | *Target Value* |
+| SubmissionRecordForm | State | New | DateCreated | $date |
+| SubmissionRecordForm | State | Assigned | DateAssigned | $date |
+| SubmissionRecordForm | State | Completed | DateCompleted | $date |
+
+</verbatim>
+
+The columns are
+
+   * Form which must be defined on the topic
+   * The name of the field that must change to trigger the plugin
+   * The value to which this field must change. Simple regex are allowed incl .* (match any change)
+   * The name of the target field
+   * The value of the target field. You can use $date and $time to define date and time for the field. Date follows the format for the Foswiki site
+   * The NOAUTOLINK is only to prevent the table from showing field names as broken wiki links in case no topic is defined for the field name
+</verbatim>
+
+<!--
+One line description, required for extensions repository catalog.
+   * Set SHORTDESCRIPTION = Set values in topic form fields based on changes of other form fields
+-->
+
+---++ Installation
+%$INSTALL_INSTRUCTIONS%
+
+---++ Plugin Info
+
+|  Author: | KennethLavrsen |
+|  Copyright: | 2013-2014, KennethLavrsen, All Rights Reserved |
+|  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
+|  Dependencies: | %$DEPENDENCIES% |
+|  Version: | %$VERSION% |
+|  Release: | %$RELEASE% |
+|  Change&nbsp;History: | <!-- versions below in reverse order -->&nbsp; |
+|  1.0.0 (%$CREATEDATE%): | Initial version |
+|  Home: | http://foswiki.org/Extensions/%TOPIC% |
+|  Support: | http://foswiki.org/Support/%TOPIC% | 
