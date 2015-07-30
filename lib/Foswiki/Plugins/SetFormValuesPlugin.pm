@@ -97,7 +97,7 @@ use Foswiki::Time    ();
 #
 # These statements MUST be on the same line. See "perldoc version" for more
 # information on version strings.
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 # $RELEASE is used in the "Find More Extensions" automation in configure.
 # It is a manually maintained string used to identify functionality steps.
@@ -111,7 +111,7 @@ our $VERSION = '1.0';
 # topic - if you use %$RELEASE% with BuildContrib this is done automatically.
 # It is preferred to keep this compatible with $VERSION. At some future
 # date, Foswiki will deprecate RELEASE and use the VERSION string.
-our $RELEASE = '1.0';
+our $RELEASE = '1.1';
 
 # Short description of this plugin
 # One line description, is shown in the %SYSTEMWEB%.TextFormattingRules topic:
@@ -248,7 +248,7 @@ sub beforeSaveHandler {
     return 1 unless ( $rulesTopic = Foswiki::Func::getPreferencesValue('SETFORMVALUESPLUGIN_RULES') );
     $rulesTopic =~ s/\s+$//;
       
-    my ( $matchForm, $matchField, $matchValue, $targetField, $targetValue );
+    my ( $matchForm, $matchField, $matchValue, $targetField, $targetValue, $targetRule );
 
     my $rulesWeb = $web;
     if ( $rulesTopic =~ /(.+)\.(.+)/ ) {
@@ -259,9 +259,9 @@ sub beforeSaveHandler {
     foreach (
         split( /\n/, Foswiki::Func::readTopicText( $rulesWeb, $rulesTopic, undef, 1 ) ) ) {
 
-        # form, match field, match value, target field, target value
-        if ( m/\|\s*([^\s|*]+)\s*\|\s*([^\|]+?)\s*\|\s*([^\|]*?)\s*\|\s*([^\|]+?)\s*\|\s*([^\|]*?)\s*\|\s*$/ ) {
-            ( $matchForm, $matchField, $matchValue, $targetField, $targetValue ) = ($1, $2, $3, $4, $5 );
+        # form, match field, match value, target field, target value, condition (optional for backwards compatibility)
+        if ( m/\|\s*([^\s|*]+)\s*\|\s*([^\|]+?)\s*\|\s*([^\|]*?)\s*\|\s*([^\|]+?)\s*\|\s*([^\|]*?)\s*\|(?:\s*([^\|]*?)\s*\|)\s*$/ ) {
+            ( $matchForm, $matchField, $matchValue, $targetField, $targetValue, $targetRule ) = ($1, $2, $3, $4, $5, $6 );
         } else {
             next;
         }
@@ -270,7 +270,6 @@ sub beforeSaveHandler {
         next unless ( $matchForm && $matchField && $targetField );
         
         if ( $meta->getFormName eq $matchForm ) {         
-            #my $fieldName = "State";
 
             my ( $oldmeta, $oldtext ) = Foswiki::Func::readTopic( $web, $topic );
 
@@ -280,12 +279,20 @@ sub beforeSaveHandler {
             my $oldValue = $oldfieldhashref ?
                                $oldmeta->get( 'FIELD', $matchField )->{'value'} :
                                '';
+                       
             my $newfieldhashref = $meta->get( 'FIELD', $matchField );
             next unless $newfieldhashref;
             
             my $newValue = $newfieldhashref ?
                                $meta->get( 'FIELD', $matchField )->{'value'} :
                                '';
+
+            my $oldTargetFieldhashref = $oldmeta->get( 'FIELD', $targetField );         
+            my $oldTargetValue = $oldTargetFieldhashref ?
+                               $oldmeta->get( 'FIELD', $targetField )->{'value'} :
+                               '';
+
+            next if ( $targetRule eq 'EMPTY' && $oldTargetValue ne '' );
                                
             my $currentDate = Foswiki::Time::formatTime( time(), $Foswiki::cfg{DefaultDateFormat} );
             my $currentTime = Foswiki::Time::formatTime( time(), '$hour:$min');
